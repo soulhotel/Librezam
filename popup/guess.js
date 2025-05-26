@@ -1,27 +1,24 @@
-import "/libs/shazam-api.min.js";
-import { FFmpeg } from "/libs/ffmpeg/ffmpeg/dist/esm/index.js"
+import { shazamGuess } from "/utils/shazamGuess.js"
+import { auddGuess } from "/utils/auddGuess.js"
 
 // grab background option from storage
 document.body.style.backgroundImage = await chrome.storage.local.get("bgImage").then(d => d.bgImage) || "url('/images/background-2.jpg')"
 
-
 writeHistory()
-let reservedFFmpeg = reserveFFmpeg()
-let audios = (await getAudiosInTab()).filter(a=> a.length)
 
+let audios = (await getAudiosInTab()).filter(a=> a.length)
 if(!audios.length){
     showError("No audio elements detected...")
 }
-
+let recognizeBackend = await chrome.storage.local.get("backend").then(o => o.backend) || "shazam"
 audios.forEach(async audio => {
-    let pcm = await convertToPCM(audio, reservedFFmpeg)
-    let result = await shazamGuess(pcm)
-
-    if(result){
-        writeResult(result)
+    try{
+        let result = recognizeBackend == "shazam" ? await shazamGuess(audio) : await auddGuess(audio)
+        await writeResult(result)
         saveHistory(result)
-    } else {
+    } catch(e) {
         showError("Song was not recognized...")
+        console.log(e)
     }
 })
 
@@ -31,19 +28,11 @@ async function writeHistory(){
         document.getElementById("historyTBody").insertAdjacentHTML("afterbegin",`
             <tr>
                 <td>${history.title}</td>
-                 <td>${history.artist}</td>
-                  <td>${history.year}</td>
+                <td>${history.artist}</td>
+                <td>${history.year}</td>
             </tr>
         `)
     })
-}
-
-function reserveFFmpeg(){
-    let ffmpeg = new FFmpeg();
-    let reserve = ffmpeg.load({
-        coreURL: "/libs/ffmpeg/core/dist/esm/ffmpeg-core.js",
-    })
-    return [ffmpeg, reserve]
 }
 
 async function getAudiosInTab(){
@@ -63,47 +52,32 @@ async function sendMessagePromises(tabId, ms){
     return promises
 }
 
-async function shazamGuess(pcm){
-    let shazam = new Shazam.Shazam()
-    let samples = Shazam.s16LEToSamplesArray(pcm);
-    return await shazam.fullRecognizeSong(samples)
-}
-
-async function convertToPCM(audio, reservedFFmpeg){
-    let [ffmpeg, reserve] = reservedFFmpeg
-    await reserve
-    await ffmpeg.writeFile("audio.webm", new Uint8Array(audio));
-    await ffmpeg.exec([
-        "-i", "audio.webm",
-        "-ar", "16000",
-        "-ac", "1",
-        "-f", "s16le",
-        "-y",
-        "out.pcm"
-    ])
-    return await ffmpeg.readFile("out.pcm");
-}
-
-function writeResult(result){
+async function writeResult(result){
     circler.style.display = "none"
     resultTable.style.display = "block"
     streamProviders.style.display = "block"
 
-    titleResult.innerText = result.track.title
-    artistResult.innerText  = result.track.subtitle
-    yearResult.innerText = result.track.sections[0].metadata[2]?.text || ""
+    let isShowCoverart = await chrome.storage.local.get("isShowCoverart").then(o => o.isShowCoverart) || false
+    if(isShowCoverart){
+        surfaceContainer.style.backgroundImage = `url('${result.art}')`
+    }
 
-    appleMusicLink.href = result.track.hub.options[0].actions[0].uri
-    deezerLink.href = result.track.hub.providers[1].actions[0].uri.replace("deezer-query://", "https://")
-    spotifyLink.href = "https://open.spotify.com/search/" + result.track.hub.providers[0].actions[0].uri.slice(15)
-    youtubeLink.href = "https://www.youtube.com/results?search_query=" + result.track.hub.providers[0].actions[0].uri.slice(15)
+    let elms = ["title", "artist", "year", "apple", "deezer", "spotify", "youtube"]
+    elms.forEach(out => {
+        let outElm = document.querySelector(`.result.${out}`)
+        if(!outElm.classList.contains("stream")) {
+            outElm.innerText = result[out]
+        } else {
+            outElm.href = result[out]
+        }
+    })
 }
 
 async function saveHistory(result){
     let newItem = {
-        title: result.track.title,
-        artist: result.track.subtitle,
-        year: result.track.sections[0].metadata[2]?.text || ""
+        title: result.title,
+        artist: result.artist,
+        year: result.year
     }
 
     let histories = await chrome.storage.local.get("histories").then(o => o.histories) || []

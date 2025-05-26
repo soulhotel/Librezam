@@ -1,5 +1,36 @@
 :root {
     --brand-color: rgb(26,112,216);
+    color-scheme: dark;
+    --md-sys-color-primary: var(--md-sys-color-primary-dark);
+    --md-sys-color-on-primary: var(--md-sys-color-on-primary-dark);
+    --md-sys-color-primary-container: var(--md-sys-color-primary-container-dark);
+    --md-sys-color-on-primary-container: var(--md-sys-color-on-primary-container-dark);
+    --md-sys-color-secondary: var(--md-sys-color-secondary-dark);
+    --md-sys-color-on-secondary: var(--md-sys-color-on-secondary-dark);
+    --md-sys-color-secondary-container: var(--md-sys-color-secondary-container-dark);
+    --md-sys-color-on-secondary-container: var(--md-sys-color-on-secondary-container-dark);
+    --md-sys-color-tertiary: var(--md-sys-color-tertiary-dark);
+    --md-sys-color-on-tertiary: var(--md-sys-color-on-tertiary-dark);
+    --md-sys-color-tertiary-container: var(--md-sys-color-tertiary-container-dark);
+    --md-sys-color-on-tertiary-container: var(--md-sys-color-on-tertiary-container-dark);
+    --md-sys-color-error: var(--md-sys-color-error-dark);
+    --md-sys-color-on-error: var(--md-sys-color-on-error-dark);
+    --md-sys-color-error-container: var(--md-sys-color-error-container-dark);
+    --md-sys-color-on-error-container: var(--md-sys-color-on-error-container-dark);
+    --md-sys-color-outline: var(--md-sys-color-outline-dark);
+    --md-sys-color-background: var(--md-sys-color-background-dark);
+    --md-sys-color-on-background: var(--md-sys-color-on-background-dark);
+    --md-sys-color-surface: var(--md-sys-color-surface-dark);
+    --md-sys-color-on-surface: var(--md-sys-color-on-surface-dark);
+    --md-sys-color-surface-variant: var(--md-sys-color-surface-variant-dark);
+    --md-sys-color-on-surface-variant: var(--md-sys-color-on-surface-variant-dark);
+    --md-sys-color-inverse-surface: var(--md-sys-color-inverse-surface-dark);
+    --md-sys-color-inverse-on-surface: var(--md-sys-color-inverse-on-surface-dark);
+    --md-sys-color-inverse-primary: var(--md-sys-color-inverse-primary-dark);
+    --md-sys-color-shadow: var(--md-sys-color-shadow-dark);
+    --md-sys-color-surface-tint: var(--md-sys-color-surface-tint-dark);
+    --md-sys-color-outline-variant: var(--md-sys-color-outline-variant-dark);
+    --md-sys-color-scrim: var(--md-sys-color-scrim-dark)
 }
 
 
@@ -52,7 +83,9 @@ body {
 hr {
     width:96%;
     border-radius:96%;
-    color: color-mix(in srgb, var(--md-sys-color-outline-variant) 90%, transparent 10%)
+    margin-top:0px;
+    padding-top:0px;
+    color: color-mix(in srgb, var(--md-sys-color-outline-variant) 90%, transparent 10%);
 }
 
 
@@ -88,11 +121,9 @@ hr {
 }
 /* adjust spacing when #resultTable.active */
 #surfaceContainer:has(#resultTable:not([style="display:none; text-align: center;"])) {
-    margin-bottom:170px !important;
-/*
- 5 *6+56 for header specified header height above,
- 114 for qol spacing between #streamProviders and #historyTable
- */
+    height:auto;
+    padding-bottom:8px;
+    background-size:100% 100%;
 }
 
 
@@ -101,7 +132,7 @@ hr {
 #streamProviders a {
     font-size:32px;
     margin-inline:10px;
-    padding:12px 8px 6px 8px;
+    padding:12px 8px 4px 8px;
     border: 1px solid color-mix(in srgb,var(--md-sys-color-outline-variant) 50%, transparent 50%);
     border-radius:5px;
     background-color:rgba(15,100,150,0.0);
