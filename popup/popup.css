@@ -35,7 +35,7 @@
 
 
 body {
-    width: 350px;
+    width: 350px; /* 100% width may be better for cross compatibility (android) */
     height: 500px;
     overflow-y: auto;
     background-image: url("/images/background-2.jpg"); /*default*/
@@ -50,6 +50,15 @@ body {
     height:56px;
     align-items: center;
     justify-content: center;
+}
+/* surface contaienr when Music Cover Art appended */
+#surfaceContainer[style*="background-image: url"] {
+    height:300px !important; /* Surface container matches Cover Art size (square) */
+    background-color: rgba(100, 100,100,1) !important; /* filter for visibility */
+    background-blend-mode: multiply;
+    background-position: center center !important; 
+    background-repeat: no-repeat !important;
+    /*background-size: contain;*/ /* if you limit the image to its own container, this will keep aspect ratio*/
 }
 /* setting button */
 #settingsButton {
